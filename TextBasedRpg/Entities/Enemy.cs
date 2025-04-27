@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextBasedRpg.StateManagment;
+using TextBasedRpg.GameObjects;
 
 namespace TextBasedRpg.Entities
 {
@@ -11,23 +13,26 @@ namespace TextBasedRpg.Entities
         public string Type;
         public int ExperienceReward { get; set; }
 
-        public Enemy(string name, int health, int attackPower, int defensePower, string type, int experienceReward)
-            : base(name, health, attackPower, defensePower)
+        public Enemy(string name, int health, int attackPower, int defensePower, string type, int experienceReward, List<Ability> abilities = null)
+            : base(name, health, attackPower, defensePower, abilities)
         {
             Type = type;
             ExperienceReward = experienceReward;
         }
 
-        public void AttackPlayer(Player player)
+        public void AttackPlayer(Player player, Dice dice)
         {
             Console.WriteLine($"{Name} attacks {player.Name}!");
-            player.TakeDamage(AttackPower);
+            int attackRoll = dice.Roll() + (AttackPower / 2);
+            Console.WriteLine($"{Name} rolled {attackRoll} attack damage!");
+            player.TakeDamage(attackRoll);
             if (!player.IsAlive())
             {
                 Console.WriteLine($"{player.Name} has been defeated!");
             }
         }
 
+        // I might not implement this method
         public void DropLoot()
         {
             
@@ -42,6 +47,11 @@ namespace TextBasedRpg.Entities
             {
                 Console.WriteLine($"{Name} did not drop any loot.");
             }
+        }
+        public void EndTurn()
+        {
+            Console.WriteLine($"{Name}'s turn has ended.");
+            Abilities.ForEach(ability => ability.EndTurn());
         }
     }
 }

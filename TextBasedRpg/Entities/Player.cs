@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextBasedRpg.GameObjects;
+using TextBasedRpg.StateManagment;
 
 namespace TextBasedRpg.Entities
 {
@@ -13,8 +15,9 @@ namespace TextBasedRpg.Entities
 
         public List<string> Inventory { get; set; }
 
-        public Player(string name = "Hero", int health = 100, int attackPower = 10, int defensePower = 5)
-            : base(name, health, attackPower, defensePower)
+
+        public Player(string name = "Hero", int health = 100, int attackPower = 10, int defensePower = 5, List<Ability> abilities = null)
+            : base(name, health, attackPower, defensePower, abilities)
         {
             Level = 1;
             Experience = 0;
@@ -53,18 +56,32 @@ namespace TextBasedRpg.Entities
             }
         }
 
-        public void Attack(Entity target)
+        public void Attack(Entity target, Dice dice)
         {
             Console.WriteLine($"{Name} attacks {target.Name}!");
-            target.TakeDamage(AttackPower);
+            int attackRoll = dice.Roll() + (AttackPower / 2);
+            Console.WriteLine($"{Name} rolled {attackRoll} attack damage!");
+
+            target.TakeDamage(attackRoll);
             if (!target.IsAlive())
             {
                 Console.WriteLine($"{target.Name} has been defeated!");
+                if (target is Enemy enemy)
+                {
+                    GainExperience(enemy.ExperienceReward);
+                    enemy.DropLoot();
+                }
             }
             else
             {
                 Console.WriteLine($"{target.Name} has {target.Health} health remaining.");
             }
+        }
+
+        public void EndTurn()
+        {
+            Console.WriteLine($"{Name}'s turn has ended.");
+            Abilities.ForEach(ability => ability.EndTurn());
         }
     }
 }

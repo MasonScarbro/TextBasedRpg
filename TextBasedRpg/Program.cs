@@ -1,42 +1,14 @@
 ﻿using TextBasedRpg.Entities;
+using TextBasedRpg.StateManagment;
 
 namespace TextBasedRpg
 {
-    public class Game
+    public class Program
     {
-        private Player currPlayer;
-        private List<Entity> entities;
-        private State currState;
-
-        public Game()
+        static void Main(string[] args)
         {
-            currPlayer = new Player();
-            entities = new List<Entity>();
-            currState = State.MainMenu;
-        }
-
-        public void Start()
-        {
-            while (true)
-            {
-                //switch (currState)
-                //{
-                //    case State.MainMenu:
-                //        MainMenu();
-                //        break;
-                //    case State.Gameplay:
-                //        Gameplay();
-                //        break;
-                //    case State.Inventory:
-                //        Inventory();
-                //        break;
-                //    case State.Stats:
-                //        Stats();
-                //        break;
-                //    case State.Exit:
-                //        return;
-                //}
-            }
+            Game game = new Game();
+            game.Start();
         }
     }
 

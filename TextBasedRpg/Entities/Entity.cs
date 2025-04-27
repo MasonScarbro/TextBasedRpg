@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextBasedRpg.GameObjects;
 
 namespace TextBasedRpg.Entities
 {
@@ -12,14 +13,15 @@ namespace TextBasedRpg.Entities
         public int Health;
         public int AttackPower;
         public int DefensePower;
-        
+        public List<Ability> Abilities = new List<Ability> { new("quack", "does nothing", 0, 1) };
 
-        public Entity(string name, int health, int attackPower, int defensePower)
+        public Entity(string name, int health, int attackPower, int defensePower, List<Ability> abilities)
         {
             Name = name;
             Health = health;
             AttackPower = attackPower;
             DefensePower = defensePower;
+            if (abilities != null) Abilities = abilities;
         }
 
         public void TakeDamage(int damage)

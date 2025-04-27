@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextBasedRpg.GameObjects;
 
 namespace TextBasedRpg.Entities
 {
@@ -10,8 +11,8 @@ namespace TextBasedRpg.Entities
     {
         public string Dialogue { get; set; }
 
-        public NPC(string name, int health, int attackPower, int defensePower, string dialogue)
-            : base(name, health, attackPower, defensePower)
+        public NPC(string name, int health, int attackPower, int defensePower, string dialogue, List<Ability> abilities = null)
+            : base(name, health, attackPower, defensePower, abilities)
         {
             Dialogue = dialogue;
         }
