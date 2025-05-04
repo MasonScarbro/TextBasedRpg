@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TextBasedRpg.Entities;
+using TextBasedRpg.GameObjects;
 
 namespace TextBasedRpg.StateManagment
 {
@@ -17,6 +18,13 @@ namespace TextBasedRpg.StateManagment
         public Game()
         {
             currPlayer = new Player();
+            currPlayer.Inventory.AddItem(new Item("Health Potion", ItemType.Consumable, 20, 0, 0));
+            currPlayer.Inventory.AddItem(new Item("Iron Sword", ItemType.Weapon, 0, 10, 0));
+            currPlayer.Inventory.AddItem(new Item("Leather Armor", ItemType.Armor, 0, 0, 5));
+            currPlayer.Inventory.AddItem(new Item("Wooden Shield", ItemType.Armor, 0, 0, 3));
+            currPlayer.Inventory.AddItem(new Item("Health Potion", ItemType.Consumable, 20, 0, 0));
+            currPlayer.Inventory.AddItem(new Item("Steel Sword", ItemType.Weapon, 0, 10, 0));
+
             entities = new List<Entity>();
             currState = State.MainMenu;
         }
@@ -148,23 +156,59 @@ namespace TextBasedRpg.StateManagment
         {
             Console.Clear();
             Console.WriteLine("Inventory Menu");
-            if (currPlayer.Inventory.Count == 0)
+            var items = currPlayer.Inventory.AllItems;
+            if (currPlayer.Inventory.AllItems.Count == 0)
             {
                 Console.WriteLine("Your inventory is empty.");
             }
             else
             {
-                for (int i = 0; i < currPlayer.Inventory.Count; i++)
+                for (int i = 0; i < items.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {currPlayer.Inventory[i]}");
+                    Console.WriteLine($"{i + 1}. {items[i].Name} ({items[i].Type})");
+                }
+                Console.WriteLine($"\n_________________ Equipped _________________");
+                foreach (Item equipped in currPlayer.Inventory.EquippedItems)
+                {
+                    Console.WriteLine($"{equipped.ToString()}");
                 }
 
-                Console.WriteLine("Select an item number to use it or press Enter to go back.");
-                string input = Console.ReadLine();
-                if (int.TryParse(input, out int index) && index > 0 && index <= currPlayer.Inventory.Count)
+                Console.WriteLine("\nEnter the number of the item you want to use/equip, or press Enter to return...");
+                var input = Console.ReadLine();
+                if (int.TryParse(input, out int selectedIndex) &&
+                selectedIndex > 0 && selectedIndex <= items.Count)
                 {
-                    string selectedItem = currPlayer.Inventory[index - 1];
-                    currPlayer.UseItem(selectedItem);
+                    Item item = items[selectedIndex - 1];
+                    EquipResult result = currPlayer.UseItem(item);
+                    switch (result)
+                    {
+                        case EquipResult.Success:
+                            Console.WriteLine($"You equipped {item.Name}.");
+                            break;
+                        case EquipResult.WeaponSlotFull:
+                            Console.WriteLine("You already have a weapon equipped. Unequip it first? (yes/no)");
+                            if (Console.ReadLine()?.ToLower() == "yes")
+                            {
+                                currPlayer.Inventory.UnequipItem(ItemType.Weapon);
+                                currPlayer.UseItem(item); 
+                            }
+                            break;
+                        case EquipResult.ArmorSlotFull:
+                            Console.WriteLine("You're wearing too much armor. Unequip one? (yes/no)");
+                            if (Console.ReadLine()?.ToLower() == "yes")
+                            {
+                                currPlayer.Inventory.UnequipItem(ItemType.Armor);
+                                currPlayer.UseItem(item); 
+                            }
+                            break;
+                        case EquipResult.Consumable:
+                            Console.WriteLine($"{item.Name} consumed. Health is now {currPlayer.Health}.");
+                            break;
+                        case EquipResult.NotInInventory:
+                            Console.WriteLine($"{item.Name} is not in your inventory.");
+                            break;
+                    }
+
                 }
             }
 

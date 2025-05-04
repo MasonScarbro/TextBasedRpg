@@ -13,15 +13,15 @@ namespace TextBasedRpg.Entities
         public int Level { get; set; }
         public int Experience { get; set; }
 
-        public List<string> Inventory { get; set; }
-
+        public Inventory Inventory { get; set; }
+        public int MaxHealth { get; set; } = 100;
 
         public Player(string name = "Hero", int health = 100, int attackPower = 10, int defensePower = 5, List<Ability> abilities = null)
             : base(name, health, attackPower, defensePower, abilities)
         {
             Level = 1;
             Experience = 0;
-            Inventory = new List<string>();
+            Inventory = new Inventory();
         }
 
         public void GainExperience(int amount)
@@ -39,23 +39,53 @@ namespace TextBasedRpg.Entities
             AttackPower += 2; // Increase attack power on level up
             DefensePower += 1; // Increase defense power on level up
             Health += 10; // Increase health on level up
+            MaxHealth = Health; 
             Console.WriteLine($"{Name} leveled up to level {Level}!");
         }
 
-        public void UseItem(string item)
+        public EquipResult UseItem(Item item)
         {
-            if (Inventory.Contains(item))
+            if (!Inventory.AllItems.Contains(item)) return EquipResult.NotInInventory;
+            if (item.Type == ItemType.Consumable) 
             {
-                Inventory.Remove(item);
-                Console.WriteLine($"{Name} used {item}.");
-                // Implement item effects here
-            }
-            else
+                Health += item.HealthRestore;
+                if (Health > MaxHealth)
+                {
+                    Health = MaxHealth;
+                }
+                DefensePower += item.DefensePower;
+                AttackPower += item.AttackPower; // if the consumable gives any it can just be permanent?
+                Inventory.RemoveItem(item);
+                return EquipResult.Consumable;
+            } else
             {
-                Console.WriteLine($"{Name} does not have {item} in the inventory.");
+                if (item.Type == ItemType.Weapon && Inventory.WeaponCount >= Inventory.WeaponLimit)
+                    return EquipResult.WeaponSlotFull;
+
+                if (item.Type == ItemType.Armor && Inventory.ArmorCount >= Inventory.ArmorLimit)
+                    return EquipResult.ArmorSlotFull;
+
+                Inventory.EquippedItems.Add(item);
+                Inventory.AllItems.Remove(item);
+                if (item.Type == ItemType.Weapon)
+                    Inventory.WeaponCount++;
+                else if (item.Type == ItemType.Armor)
+                    Inventory.ArmorCount++;
+
+                return EquipResult.Success;
+
             }
+
         }
 
+
+        public void AddItemToInventory(Item item)
+        {
+            Inventory.AddItem(item);
+            Console.WriteLine($"{item.Name} has been added to the inventory.");
+        }
+
+        
         public void Attack(Entity target, Dice dice)
         {
             Console.WriteLine($"{Name} attacks {target.Name}!");

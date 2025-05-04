@@ -15,5 +15,4 @@ namespace TextBasedRpg.StateManagment
         Exit
     }
 
-
 }
