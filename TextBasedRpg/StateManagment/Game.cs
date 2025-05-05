@@ -24,7 +24,8 @@ namespace TextBasedRpg.StateManagment
             currPlayer.Inventory.AddItem(new Item("Wooden Shield", ItemType.Armor, 0, 0, 3));
             currPlayer.Inventory.AddItem(new Item("Health Potion", ItemType.Consumable, 20, 0, 0));
             currPlayer.Inventory.AddItem(new Item("Steel Sword", ItemType.Weapon, 0, 10, 0));
-
+            currPlayer.Abilities.Add(new Ability("Fireball", "A powerful fire attack", 20, 3));
+            currPlayer.Abilities.Add(new Ability("Ice Spike", "A freezing attack", 15, 3));
             entities = new List<Entity>();
             currState = State.MainMenu;
         }
@@ -118,7 +119,8 @@ namespace TextBasedRpg.StateManagment
             while (enemy.IsAlive() && currPlayer.IsAlive())
             {
                 Console.WriteLine("\n1. Attack");
-                Console.WriteLine("2. Run");
+                Console.WriteLine("\n2. Abilities");
+                Console.WriteLine("3. Run");
                 Console.Write("Choose an action: ");
                 string action = Console.ReadLine();
 
@@ -134,6 +136,27 @@ namespace TextBasedRpg.StateManagment
 
                 }
                 else if (action == "2")
+                {
+                    
+                    for (int i = 0; i < currPlayer.Abilities.Count; i++)
+                    {
+                        Console.WriteLine($"{i + 1}. {currPlayer.Abilities[i].ToString()})");
+                    }
+                    Console.WriteLine("\nEnter the number of the item you want to use/equip, or press Enter to return...");
+                    var input = Console.ReadLine();
+                    if (int.TryParse(input, out int selectedIndex) &&
+                        selectedIndex > 0 && selectedIndex <= currPlayer.Abilities.Count)
+                    {
+                        currPlayer.Attack(enemy, dice, ability: currPlayer.Abilities[selectedIndex - 1]);
+                        currPlayer.EndTurn();
+                        if (enemy.IsAlive())
+                        {
+                            enemy.AttackPlayer(currPlayer, dice);
+                            enemy.EndTurn();
+                        }
+                    }
+                }
+                else if (action == "3")
                 {
                     Console.WriteLine("You fled the battle!");
                     break;

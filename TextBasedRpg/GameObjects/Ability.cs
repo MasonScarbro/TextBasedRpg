@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TextBasedRpg.Entities;
+using TextBasedRpg.StateManagment;
 
 namespace TextBasedRpg.GameObjects
 {
@@ -22,19 +23,21 @@ namespace TextBasedRpg.GameObjects
             Description = description;
             Damage = damage;
             Cooldown = cooldown;
+           
         }
+        
+        public bool IsOnCoolDown() => currentCooldown > 0;
 
-        public void Activate(Entity target)
+        public void StartCooldown()
         {
-            if (currentCooldown > 0)
+            if (currentCooldown == 0)
             {
-                Console.WriteLine($"{Name} is on cooldown for {Cooldown} turns.");
-                return;
+                currentCooldown = Cooldown + 1; // plus one because the turn you use it is not a cooldown turn
             }
-
-            Console.WriteLine($"{Name} used on {target.Name}!");
-            target.TakeDamage(Damage);
-            currentCooldown = Cooldown;
+            else
+            {
+                Console.WriteLine($"{Name} is on cooldown for {currentCooldown} turns.");
+            }
         }
 
         public void EndTurn()
@@ -43,6 +46,12 @@ namespace TextBasedRpg.GameObjects
             {
                 currentCooldown--;
             }
+        }
+        
+        public override string ToString()
+        {
+            return $"{Name} - {Description}\n" +
+                   $"{Damage} | {currentCooldown}";
         }
     }
 }

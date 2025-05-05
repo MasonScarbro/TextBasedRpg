@@ -86,10 +86,22 @@ namespace TextBasedRpg.Entities
         }
 
         
-        public void Attack(Entity target, Dice dice)
+        public void Attack(Entity target, Dice dice, Ability ability = null)
         {
-            Console.WriteLine($"{Name} attacks {target.Name}!");
-            int attackRoll = dice.Roll() + (AttackPower / 2);
+            int attackRoll;
+            if (ability != null)
+            {
+                ability.StartCooldown();
+                Console.WriteLine($"{Name} uses {ability.Name} on {target.Name}!");
+                attackRoll = dice.Roll() + (ability.Damage / 2);
+                
+            }
+            else
+            {
+                Console.WriteLine($"{Name} attacks {target.Name}!");
+                attackRoll = dice.Roll() + (AttackPower / 2);
+                
+            }
             Console.WriteLine($"{Name} rolled {attackRoll} attack damage!");
 
             target.TakeDamage(attackRoll);
@@ -107,6 +119,8 @@ namespace TextBasedRpg.Entities
                 Console.WriteLine($"{target.Name} has {target.Health} health remaining.");
             }
         }
+
+        
 
         public void EndTurn()
         {
