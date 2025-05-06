@@ -110,7 +110,7 @@ namespace TextBasedRpg.StateManagment
             Console.Clear();
             Console.WriteLine("You venture into the unknown...");
 
-            // For now, we'll just randomly spawn an enemy
+           
             Enemy enemy = Enemy.GenerateRandom(currPlayer.Level);
             entities.Add(enemy);
 
@@ -119,7 +119,7 @@ namespace TextBasedRpg.StateManagment
             while (enemy.IsAlive() && currPlayer.IsAlive())
             {
                 Console.WriteLine("\n1. Attack");
-                Console.WriteLine("\n2. Abilities");
+                Console.WriteLine("2. Abilities");
                 Console.WriteLine("3. Run");
                 Console.Write("Choose an action: ");
                 string action = Console.ReadLine();
@@ -180,6 +180,7 @@ namespace TextBasedRpg.StateManagment
             {
                 Console.WriteLine("\nThe battle has ended.");
                 Console.WriteLine("Press any key to return to the menu...");
+                entities.Remove(enemy);
                 Console.ReadKey();
             }
         }

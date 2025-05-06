@@ -64,7 +64,8 @@ namespace TextBasedRpg.Entities
                 AttackPower += item.AttackPower; // if the consumable gives any it can just be permanent?
                 Inventory.RemoveItem(item);
                 return EquipResult.Consumable;
-            } else
+            } 
+            else
             {
                 if (item.Type == ItemType.Weapon && Inventory.WeaponCount >= Inventory.WeaponLimit)
                     return EquipResult.WeaponSlotFull;
@@ -134,8 +135,8 @@ namespace TextBasedRpg.Entities
             int attackRoll;
             if (ability != null)
             {
-                ability.StartCooldown();
                 if (ability.IsOnCoolDown()) return;
+                ability.StartCooldown();
                 Console.WriteLine($"{Name} uses {ability.Name} on {target.Name}!");
                 attackRoll = dice.Roll() + (ability.Damage / 2);
                 
