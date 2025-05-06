@@ -111,7 +111,7 @@ namespace TextBasedRpg.StateManagment
             Console.WriteLine("You venture into the unknown...");
 
             // For now, we'll just randomly spawn an enemy
-            Enemy enemy = new Enemy("Goblin", 30, 8, 3, "Beast", 50);
+            Enemy enemy = Enemy.GenerateRandom(currPlayer.Level);
             entities.Add(enemy);
 
             Console.WriteLine($"A wild {enemy.Name} appears!");
@@ -134,6 +134,8 @@ namespace TextBasedRpg.StateManagment
                         enemy.EndTurn();
                     }
 
+                    
+
                 }
                 else if (action == "2")
                 {
@@ -154,6 +156,7 @@ namespace TextBasedRpg.StateManagment
                             enemy.AttackPlayer(currPlayer, dice);
                             enemy.EndTurn();
                         }
+                        
                     }
                 }
                 else if (action == "3")
@@ -172,6 +175,12 @@ namespace TextBasedRpg.StateManagment
                 Console.WriteLine("Game Over. Press any key to exit...");
                 Console.ReadKey();
                 currState = State.Exit;
+            }
+            else if (!enemy.IsAlive())
+            {
+                Console.WriteLine("\nThe battle has ended.");
+                Console.WriteLine("Press any key to return to the menu...");
+                Console.ReadKey();
             }
         }
 
@@ -212,7 +221,7 @@ namespace TextBasedRpg.StateManagment
                             Console.WriteLine("You already have a weapon equipped. Unequip it first? (yes/no)");
                             if (Console.ReadLine()?.ToLower() == "yes")
                             {
-                                currPlayer.Inventory.UnequipItem(ItemType.Weapon);
+                                currPlayer.UnequipItem(ItemType.Weapon);
                                 currPlayer.UseItem(item); 
                             }
                             break;
@@ -220,7 +229,7 @@ namespace TextBasedRpg.StateManagment
                             Console.WriteLine("You're wearing too much armor. Unequip one? (yes/no)");
                             if (Console.ReadLine()?.ToLower() == "yes")
                             {
-                                currPlayer.Inventory.UnequipItem(ItemType.Armor);
+                                currPlayer.UnequipItem(ItemType.Armor);
                                 currPlayer.UseItem(item); 
                             }
                             break;
@@ -231,7 +240,7 @@ namespace TextBasedRpg.StateManagment
                             Console.WriteLine($"{item.Name} is not in your inventory.");
                             break;
                     }
-
+                    
                 }
             }
 

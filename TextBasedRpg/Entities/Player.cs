@@ -27,7 +27,7 @@ namespace TextBasedRpg.Entities
         public void GainExperience(int amount)
         {
             Experience += amount;
-            if (Experience >= Level * 100) // Example level-up condition
+            if (Experience >= Level * 100)
             {
                 LevelUp();
             }
@@ -38,8 +38,15 @@ namespace TextBasedRpg.Entities
             Level++;
             AttackPower += 2; // Increase attack power on level up
             DefensePower += 1; // Increase defense power on level up
-            Health += 10; // Increase health on level up
-            MaxHealth = Health; 
+            MaxHealth += 10; // Increase health on level up
+            Health = MaxHealth; //restore health on level up 
+            Random rand = new Random();
+            if (rand.Next(1, 101) <= 20) 
+            {
+                var ability = Ability.GenerateRandom(Level);
+                Abilities.Add(ability);
+                Console.WriteLine($"{Name} has learned a new ability: {ability.Name}!");
+            }
             Console.WriteLine($"{Name} leveled up to level {Level}!");
         }
 
@@ -68,14 +75,50 @@ namespace TextBasedRpg.Entities
                 Inventory.EquippedItems.Add(item);
                 Inventory.AllItems.Remove(item);
                 if (item.Type == ItemType.Weapon)
+                {
                     Inventory.WeaponCount++;
+                    AttackPower += item.AttackPower;
+                }     
                 else if (item.Type == ItemType.Armor)
+                {
                     Inventory.ArmorCount++;
+                    DefensePower += item.DefensePower;
+                }
+                    
 
                 return EquipResult.Success;
 
             }
 
+        }
+
+        public void UnequipItem(ItemType type)
+        {
+            
+            var item = Inventory.EquippedItems.FirstOrDefault(i => i.Type == type);
+            if (item != null)
+            {
+                Inventory.EquippedItems.Remove(item);
+                Inventory.AllItems.Add(item);
+
+                if (type == ItemType.Weapon)
+                {
+                    Inventory.WeaponCount--; 
+                    AttackPower -= item.AttackPower; // Remove the attack power of the unequipped weapon
+                }
+                if (type == ItemType.Armor)
+                {
+                    Inventory.ArmorCount--;
+                    DefensePower -= item.DefensePower; // Remove the defense power of the unequipped armor
+
+                }
+
+                Console.WriteLine($"{item.Name} has been unequipped.");
+            }
+            else
+            {
+                Console.WriteLine($"No {type.ToString().ToLower()} is currently equipped.");
+            }
         }
 
 
@@ -92,6 +135,7 @@ namespace TextBasedRpg.Entities
             if (ability != null)
             {
                 ability.StartCooldown();
+                if (ability.IsOnCoolDown()) return;
                 Console.WriteLine($"{Name} uses {ability.Name} on {target.Name}!");
                 attackRoll = dice.Roll() + (ability.Damage / 2);
                 
@@ -111,7 +155,7 @@ namespace TextBasedRpg.Entities
                 if (target is Enemy enemy)
                 {
                     GainExperience(enemy.ExperienceReward);
-                    enemy.DropLoot();
+                    enemy.DropLoot(this);
                 }
             }
             else
@@ -120,7 +164,7 @@ namespace TextBasedRpg.Entities
             }
         }
 
-        
+       
 
         public void EndTurn()
         {

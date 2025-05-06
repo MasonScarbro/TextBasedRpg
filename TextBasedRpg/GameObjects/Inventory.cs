@@ -46,24 +46,7 @@ namespace TextBasedRpg.GameObjects
             }
         }
 
-        public void UnequipItem(ItemType type)
-        {
-            var item = EquippedItems.FirstOrDefault(i => i.Type == type);
-            if (item != null)
-            {
-                EquippedItems.Remove(item);
-                AllItems.Add(item);
-
-                if (type == ItemType.Weapon) WeaponCount--;
-                if (type == ItemType.Armor) ArmorCount--;
-
-                Console.WriteLine($"{item.Name} has been unequipped.");
-            }
-            else
-            {
-                Console.WriteLine($"No {type.ToString().ToLower()} is currently equipped.");
-            }
-        }
+        
 
         public void AddItem(Item item)
         {

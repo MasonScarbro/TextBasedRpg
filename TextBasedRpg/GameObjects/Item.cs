@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextBasedRpg.Entities;
+using TextBasedRpg.Libraries;
 
 namespace TextBasedRpg.GameObjects
 {
@@ -11,7 +14,7 @@ namespace TextBasedRpg.GameObjects
         Weapon,
         Armor,
         Consumable,
-        
+
     }
     public class Item
     {
@@ -31,6 +34,33 @@ namespace TextBasedRpg.GameObjects
             HealthRestore = healthRestore;
             AttackPower = attackPower;
             DefensePower = defensePower;
+        }
+
+
+        public static Item GenerateRandom(Player player)
+        {
+            Random rng = new Random();
+
+            ItemType type = (ItemType)rng.Next(0, 2); // 0 = Weapon, 1 = Armor, 2 = Consumable
+            string material = LootLibrary.Materials[rng.Next(LootLibrary.Materials.Count)];
+
+            string baseName;
+
+            int atk = 0;
+            int def = 0;
+
+            if (type == ItemType.Weapon)
+            {
+                baseName = LootLibrary.WeaponTypes[rng.Next(LootLibrary.WeaponTypes.Count)];
+                atk = rng.Next(1, 5) + player.Level * rng.Next(1, 4);
+            }
+            else
+            {
+                baseName = LootLibrary.ArmorTypes[rng.Next(LootLibrary.ArmorTypes.Count)];
+                def = rng.Next(1, 5) + player.Level * rng.Next(1, 4);
+            }
+
+            return new Item($"{material} {baseName}", type, 0, atk, def, $"A {baseName.ToLower()} forged from {material.ToLower()}.");
         }
 
         public override string ToString()
